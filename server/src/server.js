@@ -2,8 +2,11 @@ import "dotenv/config";
 import express from "express";
 import cookieParser from "cookie-parser";
 import cors from "cors";
-import { verify } from "jsonwebtoken";
-import { hash, compare } from "bcryptjs";
+import jsonwebtoken from "jsonwebtoken";
+import bcryptjs from "bcryptjs";
+
+const { compare, hash } = bcryptjs;
+const { verify } = jsonwebtoken;
 
 // 1. register a user
 
