@@ -5,17 +5,21 @@ import cors from "cors";
 import jsonwebtoken from "jsonwebtoken";
 import bcryptjs from "bcryptjs";
 import fakedb from "./fakedb.js";
+import {
+  createAccessToken,
+  createRefreshToken,
+  sendAccessToken,
+  sendRefreshToken,
+} from "./tokens.js";
 
 const { compare, hash } = bcryptjs;
 const { verify } = jsonwebtoken;
 
-// 2. login a user
 
-// 3. logout a user
 
 // 4. setup a protected route
 
-//5. Get a new accesstoken with a refresh token
+// 5. Get a new accesstoken with a refresh token
 
 const server = express();
 
@@ -74,6 +78,39 @@ server.post("/register", async (req, res) => {
     console.log(fakedb);
   } catch (error) {
     res.status(400).send({ error: `${error.message}` });
+  }
+});
+
+// 2. login a user
+server.post("/login", async (req, res) => {
+  const { email, password } = req.body;
+
+  try {
+    //1 Find user in "database, if not exist send errors"
+    const user = fakedb.find((user) => user.email === email);
+
+    if (!user) throw new Error("user does not exist");
+
+    //2 compare crypted psswod and see if it checks out, send error if not
+    const valid = await compare(password, user.password);
+
+    if (!valid) throw new Error("Password is incorrect");
+
+    //3. create refresh and accesstoken
+    const accessToken = createAccessToken(user.id);
+    const refreshToken = createRefreshToken(user.id);
+
+    //4 put the refreshtoken in the "database"
+    user.refreshToken = refreshToken;
+    console.log(fakedb);
+
+    // 5 send the refresh token as a cookie and access toekn as a regular response
+
+    sendRefreshToken(res, refreshToken);
+    sendAccessToken(req, res, accessToken);
+  } catch (error) {
+    console.log(error);
+    res.send({ error: `${error.message}` });
   }
 });
 
