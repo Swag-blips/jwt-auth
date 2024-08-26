@@ -54,12 +54,13 @@ server.post("/register", async (req, res) => {
     if (!password) {
       throw new Error("Password is required");
     }
-    // 2. check if the user exist
 
+    // 2. check if the user exist
     const user = fakedb.find((user) => user.email === email);
     if (user) {
       throw new Error("User already exist");
     }
+
     // 3. if the user exist, hash the password
     const hashedPassword = await hash(password, 10);
 
@@ -101,7 +102,6 @@ server.post("/login", async (req, res) => {
     console.log(fakedb);
 
     // 5 send the refresh token as a cookie and access toekn as a regular response
-
     sendRefreshToken(res, refreshToken);
     sendAccessToken(req, res, accessToken);
   } catch (error) {
@@ -111,7 +111,6 @@ server.post("/login", async (req, res) => {
 });
 
 // 3. logout a user
-
 server.post("/logout", (req, res) => {
   res.clearCookie("refreshtoken", { path: "/refresh_token" });
 
@@ -131,19 +130,18 @@ server.post("/protected", async (req, res) => {
       });
     }
   } catch (error) {
-    res.send({ error: ` ${error.message}` });
+    res.send({ error: `${error.message}` });
   }
 });
 
 // 5 get a new accesstoken with a refresh token
-
 server.post("/refresh_token", (req, res) => {
   const token = req.cookies.refreshtoken;
 
   // if no token in request
 
   if (!token) return res.send({ accessToken: "" });
-  //we have a token, lets verify it
+  // we have a token, lets verify it
 
   let payload = null;
 
@@ -156,7 +154,6 @@ server.post("/refresh_token", (req, res) => {
   const user = fakedb.find((user) => user.id === payload.userId);
   if (!user) return res.send({ accessToken: "" });
   //user exist, check if refresh token exists on user
-
   if (user.refreshToken !== token) {
     return res.send({ accessToken: "" });
   }
