@@ -61,7 +61,7 @@ server.post("/register", async (req, res) => {
       throw new Error("User already exist");
     }
 
-    // 3. if the user exist, hash the password
+    // 3. if the user doesn't exist, hash the password
     const hashedPassword = await hash(password, 10);
 
     //4. insert the user in the fakeDb
@@ -96,7 +96,7 @@ server.post("/login", async (req, res) => {
     //3. create refresh and accesstoken
     const accessToken = createAccessToken(user.id);
     const refreshToken = createRefreshToken(user.id);
-
+  
     //4 put the refreshtoken in the "database"
     user.refreshToken = refreshToken;
     console.log(fakedb);
@@ -134,7 +134,7 @@ server.post("/protected", async (req, res) => {
   }
 });
 
-// 5 get a new accesstoken with a refresh token
+// 5 get a new access token with a refresh token
 server.post("/refresh_token", (req, res) => {
   const token = req.cookies.refreshtoken;
 
